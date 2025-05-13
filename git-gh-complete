@@ -1,0 +1,22 @@
+#!/bin/bash
+
+_github_repo_complete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    if [[ $cur =~ ^https://github.com/[^/]+/[^/]*$ ]]; then
+        local user_repo=${cur#https://github.com/}
+        local user=${user_repo%%/*}
+        local prefix=${user_repo#*/}
+        
+        # Call GitHub API to get matching repos
+        local repos=$(curl -s "https://api.github.com/users/$user/repos?per_page=100" | \
+                     jq -r ".[].name | select(startswith(\"$prefix\"))")
+        
+        # Generate completion suggestions
+        COMPREPLY=()
+        for repo in $repos; do
+            COMPREPLY+=("https://github.com/$user/$repo")
+        done
+    fi
+}
+
+complete -F _github_repo_complete git
