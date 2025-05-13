@@ -20,6 +20,23 @@ sudo ./install.sh
 source ~/.bashrc
 ```
 
+## 配置方法
+
+1. 编辑配置文件：
+```bash
+vim ~/.git-gh-complete.conf
+```
+
+2. 取消注释并设置GitHub Token（推荐）：
+```bash
+GITHUB_TOKEN="your_personal_access_token"
+```
+
+3. 其他可选配置：
+- RATE_LIMIT_WARN: API速率限制警告阈值
+- MAX_REPOS: 每次补全返回的最大仓库数
+- DEBUG: 启用调试输出
+
 ## 使用方法
 
 1. 基本使用：
@@ -37,8 +54,11 @@ git clone https://github.com/linuxdeepin/dde<按Tab>
 ## 注意事项
 
 1. 需要联网访问GitHub API
-2. GitHub API有速率限制，频繁使用可能需要配置GitHub token
+2. GitHub API有速率限制：
+   - 未认证: 60请求/小时
+   - 使用Token: 5000请求/小时
 3. 仅支持GitHub仓库的clone操作
+4. 敏感配置（如Token）存储在~/.git-gh-complete.conf
 
 ## 卸载方法
 

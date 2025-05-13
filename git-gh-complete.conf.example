@@ -1,0 +1,15 @@
+# GitHub Complete Configuration
+# Copy this file to ~/.git-gh-complete.conf and uncomment/edit settings
+
+# GitHub Personal Access Token (required for higher rate limits)
+# Generate at: https://github.com/settings/tokens
+#GITHUB_TOKEN="your_token_here"
+
+# API rate limit warning threshold (requests remaining)
+#RATE_LIMIT_WARN=20
+
+# Maximum repos to return per completion
+#MAX_REPOS=50
+
+# Enable debug output (0/1)
+#DEBUG=0

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Load config if exists
+[ -f ~/.git-gh-complete.conf ] && source ~/.git-gh-complete.conf
+
 _github_repo_complete() {
     local cur=${COMP_WORDS[COMP_CWORD]}
     if [[ $cur =~ ^https://github.com/[^/]+/[^/]*$ ]]; then
@@ -7,15 +10,32 @@ _github_repo_complete() {
         local user=${user_repo%%/*}
         local prefix=${user_repo#*/}
         
-        # Call GitHub API to get matching repos
-        local repos=$(curl -s "https://api.github.com/users/$user/repos?per_page=100" | \
-                     jq -r ".[].name | select(startswith(\"$prefix\"))")
+        # Debug output
+        [ "$DEBUG" = "1" ] && echo -e "\nDebug: Current input: $cur" >&2
+        [ "$DEBUG" = "1" ] && echo "Debug: User: $user, Prefix: $prefix" >&2
+        
+        # Call GitHub API with token if configured
+        local api_url="https://api.github.com/users/$user/repos?per_page=100"
+        local curl_cmd="curl -s"
+        [ -n "$GITHUB_TOKEN" ] && curl_cmd="$curl_cmd -H \"Authorization: token $GITHUB_TOKEN\""
+        
+        [ "$DEBUG" = "1" ] && echo "Debug: API URL: $api_url" >&2
+        [ "$DEBUG" = "1" ] && echo "Debug: Curl command: $curl_cmd" >&2
+        
+        local response=$($curl_cmd "$api_url")
+        local repos=$(echo "$response" | jq -r ".[].name | select(startswith(\"$prefix\"))")
+        
+        [ "$DEBUG" = "1" ] && echo "Debug: Raw API response:" >&2
+        [ "$DEBUG" = "1" ] && echo "$response" | jq . >&2
+        [ "$DEBUG" = "1" ] && echo "Debug: Filtered repos: $repos" >&2
         
         # Generate completion suggestions
         COMPREPLY=()
         for repo in $repos; do
             COMPREPLY+=("https://github.com/$user/$repo")
         done
+        
+        [ "$DEBUG" = "1" ] && echo "Debug: Completion suggestions: ${COMPREPLY[@]}" >&2
     fi
 }
 
